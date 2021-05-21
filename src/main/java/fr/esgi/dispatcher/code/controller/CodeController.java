@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/code")
+@RequestMapping("/api/compiler")
 public class CodeController {
 
     private static final String MAIN = "Main";
@@ -24,6 +24,9 @@ public class CodeController {
     @PostMapping("/java")
     public ResponseEntity<String> getCode(@RequestBody String code) {
         fileService.createFile(code, MAIN + JAVA_EXTENSION);
-        return new ResponseEntity<>(javaService.compileCode(), HttpStatus.OK);
+        var result = javaService.compileCode();
+        fileService.deleteFile(JAVA_EXTENSION);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

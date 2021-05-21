@@ -10,6 +10,7 @@ import java.io.IOException;
 public class FileService {
     public boolean createFile(String code, String name) {
         try {
+            deleteFile(name);
             var fos = new FileOutputStream(name, true);
             byte[] b = code.getBytes();
             fos.write(b);
@@ -21,7 +22,11 @@ public class FileService {
         }
     }
 
-    public boolean deleteFile(String extension){
-        if()
+    public boolean deleteFile(String name){
+        var mainFile = new File(name);
+        if(mainFile.exists()){
+            return mainFile.delete();
+        }
+        return false;
     }
 }
