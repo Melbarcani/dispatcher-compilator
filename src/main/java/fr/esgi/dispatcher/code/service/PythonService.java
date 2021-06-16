@@ -1,5 +1,6 @@
 package fr.esgi.dispatcher.code.service;
 
+import fr.esgi.dispatcher.code.model.CodeResult;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -10,7 +11,7 @@ public class PythonService extends AbstractProgramingLanguageService {
     private static final String CONTAINER_TAG = "python";
     private static final String EXECUTE_PYTHON_MAIN_COMMAND = " python3 Main.py";
 
-    public String executeCode() {
+    public CodeResult executeCode() {
         return executeCode(CONTAINER_TAG, EXECUTE_PYTHON_MAIN_COMMAND);
     }
 

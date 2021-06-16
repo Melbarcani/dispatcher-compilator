@@ -1,5 +1,6 @@
 package fr.esgi.dispatcher.code.controller;
 
+import fr.esgi.dispatcher.code.model.CodeResult;
 import fr.esgi.dispatcher.code.service.FileService;
 import fr.esgi.dispatcher.code.service.JavaService;
 import fr.esgi.dispatcher.code.service.PythonService;
@@ -9,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/compiler")
-public class CodeController {
+public class
+CodeController {
 
     private static final String MAIN = "Main";
     private static final String JAVA_EXTENSION = ".java";
@@ -26,7 +28,7 @@ public class CodeController {
     }
 
     @PostMapping("/java")
-    public ResponseEntity<String> compileJava(@RequestBody String code) {
+    public ResponseEntity<CodeResult> compileJava(@RequestBody String code) {
         fileService.createFile(code, MAIN + JAVA_EXTENSION);
         var result = javaService.compileCode();
         fileService.deleteFile(MAIN + JAVA_EXTENSION);
@@ -35,7 +37,7 @@ public class CodeController {
     }
 
     @PostMapping("/python")
-    public ResponseEntity<String> compilePython(@RequestBody String code) {
+    public ResponseEntity<CodeResult> compilePython(@RequestBody String code) {
         fileService.createFile(code, MAIN + PYTHON_EXTENSION);
         var result = pythonService.executeCode();
         fileService.deleteFile(MAIN + PYTHON_EXTENSION);

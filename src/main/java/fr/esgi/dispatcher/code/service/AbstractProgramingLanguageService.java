@@ -1,5 +1,8 @@
 package fr.esgi.dispatcher.code.service;
 
+import fr.esgi.dispatcher.code.model.CodeResult;
+import fr.esgi.dispatcher.code.model.STATUS;
+
 import java.io.*;
 
 public abstract class AbstractProgramingLanguageService {
@@ -8,20 +11,20 @@ public abstract class AbstractProgramingLanguageService {
     protected static final String WORKDIR = ":/app -w /app";
     protected static final String DOCKER_RUN_COMMAND = "sudo docker run --rm -v ";
 
-    public abstract String executeCode();
+    public abstract CodeResult executeCode();
 
-    protected String executeCode(String containerTag, String file){
+    protected CodeResult executeCode(String containerTag, String file){
         try {
             var process = executeDockerCommand(WORKDIR + " " + containerTag + file);
-            String output = getResult(process.getInputStream());
-            if (output != null) return output;
+            CodeResult output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS);
+            if (output.getOutputConsole() != null) return output;
 
-            output = getResult(process.getErrorStream());
-            if (output != null) return output;
-            return "success";
+            output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
+            if (output.getOutputConsole() != null) return output;
+            return new CodeResult("", STATUS.SUCCESS);
         } catch (
                 IOException e) {
-            return FAILED + " " + e.getMessage();
+            return new CodeResult("Exception", STATUS.ERROR);
         }
     }
 

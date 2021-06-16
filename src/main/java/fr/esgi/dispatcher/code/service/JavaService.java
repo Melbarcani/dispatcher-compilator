@@ -1,39 +1,44 @@
 package fr.esgi.dispatcher.code.service;
 
+import fr.esgi.dispatcher.code.model.CodeResult;
+import fr.esgi.dispatcher.code.model.STATUS;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 
 @Service
 public class JavaService extends AbstractProgramingLanguageService{
+
     private static final String CONTAINER_TAG = "demo/oracle-java:8";
     private static final String COMPILE_JAVA_CODE_COMMAND = " javac Main.java";
     private static final String EXECUTE_JAVA_MAIN_COMMAND = " java Main";
 
-    public String compileCode() {
+    public CodeResult compileCode() {
         try{
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + COMPILE_JAVA_CODE_COMMAND);
-            String output = getResult(process.getErrorStream());
+            CodeResult output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
 
-            if (output != null) return output;
+            if (output.getOutputConsole() != null) return output;
             return executeCode(process);
 
         } catch (IOException | InterruptedException e){
             Thread.currentThread().interrupt();
-            return FAILED + " " + e.getMessage();
+            return new CodeResult(FAILED + " " + e.getMessage(), STATUS.SUCCESS);
         }
     }
 
-    private String executeCode(Process process) throws InterruptedException {
+    private CodeResult executeCode(Process process) throws InterruptedException {
         if(process.waitFor()==0){
             return executeCode();
         }
-        return FAILED;
+        return new CodeResult("", STATUS.ERROR);
     }
 
-    public String executeCode(){
+    public CodeResult executeCode(){
         return executeCode(CONTAINER_TAG, EXECUTE_JAVA_MAIN_COMMAND);
     }
+
+    @Override
     protected Process executeDockerCommand(String command) throws IOException {
         String currentPath = new File(".").getCanonicalPath();
         return Runtime.getRuntime().exec(DOCKER_RUN_COMMAND + currentPath + command);
