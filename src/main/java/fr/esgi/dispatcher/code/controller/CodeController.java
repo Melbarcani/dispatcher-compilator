@@ -27,7 +27,7 @@ CodeController {
         this.pythonService = pythonService;
     }
 
-    @PostMapping("/java")
+    @PostMapping("/Java")
     public ResponseEntity<CodeResult> compileJava(@RequestBody String code) {
 
         fileService.createFile(code, MAIN + JAVA_EXTENSION);
