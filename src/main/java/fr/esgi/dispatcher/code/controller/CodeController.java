@@ -29,6 +29,7 @@ CodeController {
 
     @PostMapping("/java")
     public ResponseEntity<CodeResult> compileJava(@RequestBody String code) {
+
         fileService.createFile(code, MAIN + JAVA_EXTENSION);
         var result = javaService.compileCode();
         fileService.deleteFile(MAIN + JAVA_EXTENSION);

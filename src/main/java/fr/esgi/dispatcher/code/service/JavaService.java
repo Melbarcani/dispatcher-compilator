@@ -16,7 +16,7 @@ public class JavaService extends AbstractProgramingLanguageService{
     public CodeResult compileCode() {
         try{
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + COMPILE_JAVA_CODE_COMMAND);
-            CodeResult output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
+            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
 
             if (output.getOutputConsole() != null) return output;
             return executeCode(process);
