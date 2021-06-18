@@ -11,11 +11,11 @@ public abstract class AbstractProgramingLanguageService {
     protected static final String WORKDIR = ":/app -w /app";
     protected static final String DOCKER_RUN_COMMAND = "sudo docker run --rm -v ";
 
-    public abstract CodeResult executeCode();
+    public abstract CodeResult executeCode(String fileName, String folderName);
 
-    protected CodeResult executeCode(String containerTag, String file){
+    protected CodeResult executeCode(String containerTag, String file, String folderName) {
         try {
-            var process = executeDockerCommand(WORKDIR + " " + containerTag + file);
+            var process = executeDockerCommand(WORKDIR + " " + containerTag + file, folderName);
             CodeResult output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS);
             if (output.getOutputConsole() != null) return output;
 
@@ -28,8 +28,8 @@ public abstract class AbstractProgramingLanguageService {
         }
     }
 
-    protected Process executeDockerCommand(String command) throws IOException {
-        String currentPath = new File(".").getCanonicalPath();
+    protected Process executeDockerCommand(String command, String folderName) throws IOException {
+        String currentPath = new File("./" + folderName).getCanonicalPath();
         return Runtime.getRuntime().exec(DOCKER_RUN_COMMAND + currentPath + command);
     }
 

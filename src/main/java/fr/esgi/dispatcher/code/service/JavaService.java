@@ -7,40 +7,41 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 
 @Service
-public class JavaService extends AbstractProgramingLanguageService{
+public class JavaService extends AbstractProgramingLanguageService {
 
     private static final String CONTAINER_TAG = "demo/oracle-java:8";
-    private static final String COMPILE_JAVA_CODE_COMMAND = " javac Main.java";
-    private static final String EXECUTE_JAVA_MAIN_COMMAND = " java Main";
+    private static final String COMPILE_JAVA_CODE_COMMAND = " javac ";
+    private static final String EXECUTE_JAVA_MAIN_COMMAND = " java ";
+    private static final String JAVA_EXTENSION = ".java";
 
-    public CodeResult compileCode() {
-        try{
-            var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + COMPILE_JAVA_CODE_COMMAND);
+    public CodeResult compileCode(String fileName, String folderName) {
+        try {
+            var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + COMPILE_JAVA_CODE_COMMAND + fileName + JAVA_EXTENSION, folderName);
             var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
 
             if (output.getOutputConsole() != null) return output;
-            return executeCode(process);
+            return executeCode(process, fileName, folderName);
 
-        } catch (IOException | InterruptedException e){
+        } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            return new CodeResult(FAILED + " " + e.getMessage(), STATUS.SUCCESS);
+            return new CodeResult(FAILED + " " + e.getMessage(), STATUS.UNCOMPILED);
         }
     }
 
-    private CodeResult executeCode(Process process) throws InterruptedException {
-        if(process.waitFor()==0){
-            return executeCode();
+    private CodeResult executeCode(Process process, String fileName, String folderName) throws InterruptedException {
+        if (process.waitFor() == 0) {
+            return executeCode(fileName, folderName);
         }
         return new CodeResult("", STATUS.ERROR);
     }
 
-    public CodeResult executeCode(){
-        return executeCode(CONTAINER_TAG, EXECUTE_JAVA_MAIN_COMMAND);
+    public CodeResult executeCode(String fileName, String folderName) {
+        return executeCode(CONTAINER_TAG, EXECUTE_JAVA_MAIN_COMMAND + fileName, folderName);
     }
 
     @Override
-    protected Process executeDockerCommand(String command) throws IOException {
-        String currentPath = new File(".").getCanonicalPath();
+    protected Process executeDockerCommand(String command, String folderName) throws IOException {
+        String currentPath = new File("./" + folderName).getCanonicalPath();
         return Runtime.getRuntime().exec(DOCKER_RUN_COMMAND + currentPath + command);
     }
 }

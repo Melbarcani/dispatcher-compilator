@@ -11,12 +11,12 @@ public class PythonService extends AbstractProgramingLanguageService {
     private static final String CONTAINER_TAG = "python";
     private static final String EXECUTE_PYTHON_MAIN_COMMAND = " python3 Main.py";
 
-    public CodeResult executeCode() {
+    public CodeResult executeCode(String fileName, String folderName) {
         return executeCode(CONTAINER_TAG, EXECUTE_PYTHON_MAIN_COMMAND);
     }
 
     @Override
-    protected Process executeDockerCommand(String command) throws IOException {
+    protected Process executeDockerCommand(String command, String folderName) throws IOException {
         String currentPath = new File(".").getCanonicalPath();
         return Runtime.getRuntime().exec(DOCKER_RUN_COMMAND + currentPath + command);
     }
