@@ -14,7 +14,6 @@ import java.util.Comparator;
 public class FileService {
     public boolean createFile(String code, String name, String folderName) {
         try {
-            //creer un dossier avec le userName puis mettre le code dedans
             deleteDirectoryStream(Paths.get(folderName));
             File userFile = createUserCompilationFolder(folderName);
             var fos = new FileOutputStream(userFile + File.separator+ name, true);
