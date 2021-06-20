@@ -16,7 +16,7 @@ public abstract class AbstractProgramingLanguageService {
     protected CodeResult executeCode(String containerTag, String file, String folderName) {
         try {
             var process = executeDockerCommand(WORKDIR + " " + containerTag + file, folderName);
-            CodeResult output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS);
+            CodeResult output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS, computeByteCodeLines(folderName, file));
             if (output.getOutputConsole() != null) return output;
 
             output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
@@ -46,4 +46,6 @@ public abstract class AbstractProgramingLanguageService {
         }
         return null;
     }
+
+    protected abstract long computeByteCodeLines(String folderName, String fileName);
 }

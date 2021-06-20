@@ -28,6 +28,16 @@ public class JavaService extends AbstractProgramingLanguageService {
         }
     }
 
+    public long computeByteCodeLines(String folderName, String fileName) {
+        try {
+            Process process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + " javap -c " + fileName + "$ChallengeIntern", folderName);
+            return getResult(process.getInputStream()).lines().count();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     private CodeResult executeCode(Process process, String fileName, String folderName) throws InterruptedException {
         if (process.waitFor() == 0) {
             return executeCode(fileName, folderName);

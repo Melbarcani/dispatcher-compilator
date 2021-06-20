@@ -5,12 +5,15 @@ import fr.esgi.dispatcher.code.model.CodeResult;
 import fr.esgi.dispatcher.code.service.FileService;
 import fr.esgi.dispatcher.code.service.JavaService;
 import fr.esgi.dispatcher.code.service.PythonService;
+import fr.esgi.dispatcher.code.service.SecurityService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/compiler")
+@RequiredArgsConstructor
 public class
 CodeController {
 
@@ -20,18 +23,22 @@ CodeController {
     private final JavaService javaService;
     private final FileService fileService;
     private final PythonService pythonService;
-
-    public CodeController(JavaService javaService, FileService fileService, PythonService pythonService) {
-        this.javaService = javaService;
-        this.fileService = fileService;
-        this.pythonService = pythonService;
-    }
+    private final SecurityService securityService;
 
     @PostMapping("/Java")
     public ResponseEntity<CodeResult> compileJava(@RequestBody CodeRequest codeRequest) {
         String fileName = codeRequest.getExerciseTitle();
+        CodeResult maliciousResult = securityService.checkJavaMaliciousCode(codeRequest.getCode());
+        if(maliciousResult != null){
+            return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
+        }
         fileService.createFile(codeRequest.getCode(), fileName + JAVA_EXTENSION, codeRequest.getUserId());
+        long startTime = System.nanoTime();
         var result = javaService.compileCode(fileName, codeRequest.getUserId());
+        long endTime = System.nanoTime();
+        javaService.computeByteCodeLines(codeRequest.getUserId(), fileName);
+        long duration = (endTime - startTime) / 1000000;
+        System.out.println("duration : " + duration);
         fileService.deleteFile(fileName + JAVA_EXTENSION, codeRequest.getUserId());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -39,6 +46,10 @@ CodeController {
 
     @PostMapping("/Python")
     public ResponseEntity<CodeResult> compilePython(@RequestBody CodeRequest codeRequest) {
+        CodeResult maliciousResult = securityService.checkPythonMaliciousCode(codeRequest.getCode());
+        if(maliciousResult != null){
+            return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
+        }
         fileService.createFile(codeRequest.getCode(), codeRequest.getExerciseTitle() + PYTHON_EXTENSION, codeRequest.getUserId());
         var result = pythonService.executeCode(codeRequest.getExerciseTitle(), codeRequest.getUserId());
         fileService.deleteFile(codeRequest.getExerciseTitle() + codeRequest.getUserId() + PYTHON_EXTENSION, codeRequest.getUserId());

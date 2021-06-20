@@ -21,7 +21,7 @@ public class PythonService {
     protected CodeResult executeCode(String containerTag, String file, String folderName) {
         try {
             var process = executeDockerCommand(WORKDIR + " " + containerTag + file, folderName);
-            CodeResult output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS);
+            var output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS, file.lines().count());
             if (output.getOutputConsole() != null) return output;
 
             output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
@@ -50,5 +50,15 @@ public class PythonService {
             return output.toString();
         }
         return null;
+    }
+
+    public long computeByteCodeLines(String folderName, String fileName) {
+        try {
+            Process process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + " javap -c " + fileName + "$ChallengeIntern", folderName);
+            return getResult(process.getInputStream()).lines().count();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }
