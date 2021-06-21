@@ -14,14 +14,14 @@ public class PythonService {
     private static final String EXECUTE_PYTHON_MAIN_COMMAND = " python3 ";
     private static final String PYTHON_EXTENSION = ".py";
 
-    public CodeResult executeCode(String fileName, String folderName) {
-        return executeCode(CONTAINER_TAG, EXECUTE_PYTHON_MAIN_COMMAND + fileName + PYTHON_EXTENSION, folderName);
+    public CodeResult executeCode(String fileName, String folderName, long lines) {
+        return executeCode(CONTAINER_TAG, EXECUTE_PYTHON_MAIN_COMMAND + fileName + PYTHON_EXTENSION, folderName, lines);
     }
 
-    protected CodeResult executeCode(String containerTag, String file, String folderName) {
+    protected CodeResult executeCode(String containerTag, String file, String folderName, long lines) {
         try {
             var process = executeDockerCommand(WORKDIR + " " + containerTag + file, folderName);
-            var output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS, file.lines().count());
+            var output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS, lines);
             if (output.getOutputConsole() != null) return output;
 
             output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
@@ -50,15 +50,5 @@ public class PythonService {
             return output.toString();
         }
         return null;
-    }
-
-    public long computeByteCodeLines(String folderName, String fileName) {
-        try {
-            Process process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + " javap -c " + fileName + "$ChallengeIntern", folderName);
-            return getResult(process.getInputStream()).lines().count();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return -1;
     }
 }

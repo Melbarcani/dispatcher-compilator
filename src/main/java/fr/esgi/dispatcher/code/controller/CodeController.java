@@ -33,12 +33,7 @@ CodeController {
             return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
         }
         fileService.createFile(codeRequest.getCode(), fileName + JAVA_EXTENSION, codeRequest.getUserId());
-        long startTime = System.nanoTime();
         var result = javaService.compileCode(fileName, codeRequest.getUserId());
-        long endTime = System.nanoTime();
-        javaService.computeByteCodeLines(codeRequest.getUserId(), fileName);
-        long duration = (endTime - startTime) / 1000000;
-        System.out.println("duration : " + duration);
         fileService.deleteFile(fileName + JAVA_EXTENSION, codeRequest.getUserId());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -51,7 +46,7 @@ CodeController {
             return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
         }
         fileService.createFile(codeRequest.getCode(), codeRequest.getExerciseTitle() + PYTHON_EXTENSION, codeRequest.getUserId());
-        var result = pythonService.executeCode(codeRequest.getExerciseTitle(), codeRequest.getUserId());
+        var result = pythonService.executeCode(codeRequest.getExerciseTitle(), codeRequest.getUserId(), codeRequest.getCode().lines().count());
         fileService.deleteFile(codeRequest.getExerciseTitle() + codeRequest.getUserId() + PYTHON_EXTENSION, codeRequest.getUserId());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
