@@ -13,15 +13,17 @@ public class PythonService {
     private static final String CONTAINER_TAG = "python";
     private static final String EXECUTE_PYTHON_MAIN_COMMAND = " python3 ";
     private static final String PYTHON_EXTENSION = ".py";
+    private static final String REGEX_LINES = "&lines&";
+    private static final String REGEX_COUNT = "&count&";
 
-    public CodeResult executeCode(String fileName, String folderName, long lines) {
-        return executeCode(CONTAINER_TAG, EXECUTE_PYTHON_MAIN_COMMAND + fileName + PYTHON_EXTENSION, folderName, lines);
-    }
 
-    protected CodeResult executeCode(String containerTag, String file, String folderName, long lines) {
+    public CodeResult executeCode(String file, String folderName) {
+        var fileName = EXECUTE_PYTHON_MAIN_COMMAND + file + PYTHON_EXTENSION;
         try {
-            var process = executeDockerCommand(WORKDIR + " " + containerTag + file, folderName);
-            var output = new CodeResult(getResult(process.getInputStream()), STATUS.SUCCESS, lines);
+            var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + fileName, folderName);
+            var consoleOutput = getResult(process.getInputStream());
+            var linesCount = Integer.valueOf(consoleOutput.substring(consoleOutput.indexOf(REGEX_LINES) + REGEX_LINES.length(), consoleOutput.indexOf(REGEX_COUNT)).trim());
+            var output = new CodeResult(consoleOutput.split(REGEX_LINES)[0], STATUS.SUCCESS,linesCount);
             if (output.getOutputConsole() != null) return output;
 
             output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
