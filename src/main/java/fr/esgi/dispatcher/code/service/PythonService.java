@@ -9,12 +9,12 @@ import java.io.*;
 @Service
 public class PythonService {
     protected static final String WORKDIR = ":/app -w /app";
-    protected static final String DOCKER_RUN_COMMAND = "sudo docker run --rm -v ";
+    protected static final String DOCKER_RUN_COMMAND = "docker run --rm -v ";
     private static final String CONTAINER_TAG = "python";
     private static final String EXECUTE_PYTHON_MAIN_COMMAND = " python3 ";
     private static final String PYTHON_EXTENSION = ".py";
-    private static final String REGEX_LINES = "&lines&";
-    private static final String REGEX_COUNT = "&count&";
+    private static final String REGEX_LINES = "&&&lines&&& ";
+    private static final String REGEX_COUNT = " &&&count&&&";
 
 
     public CodeResult executeCode(String file, String folderName) {
@@ -22,8 +22,7 @@ public class PythonService {
         try {
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + fileName, folderName);
             var consoleOutput = getResult(process.getInputStream());
-            var linesCount = Integer.valueOf(consoleOutput.substring(consoleOutput.indexOf(REGEX_LINES) + REGEX_LINES.length(), consoleOutput.indexOf(REGEX_COUNT)).trim());
-            var output = new CodeResult(consoleOutput.split(REGEX_LINES)[0], STATUS.SUCCESS,linesCount);
+            var output = createResult(consoleOutput);
             if (output.getOutputConsole() != null) return output;
 
             output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
@@ -33,6 +32,23 @@ public class PythonService {
                 IOException e) {
             return new CodeResult("Exception", STATUS.ERROR);
         }
+    }
+
+    private CodeResult createResult(String consoleOutput) {
+        var instructionsCount = 0;
+        if (consoleOutput.contains(REGEX_COUNT) && consoleOutput.contains(REGEX_LINES)) {
+            var counterString = consoleOutput.substring(consoleOutput.indexOf(REGEX_LINES) + 12, consoleOutput.indexOf(REGEX_COUNT));
+            try {
+                instructionsCount = Integer.parseInt(counterString);
+            } catch (NumberFormatException e) {
+                instructionsCount = 0;
+            }
+        }
+        if (consoleOutput.contains(REGEX_COUNT)) {
+            String[] parts = consoleOutput.split(REGEX_COUNT);
+            return new CodeResult(parts[1], STATUS.SUCCESS, instructionsCount);
+        }
+        return new CodeResult(consoleOutput, STATUS.SUCCESS, instructionsCount);
     }
 
     protected Process executeDockerCommand(String command, String folderName) throws IOException {
