@@ -50,12 +50,18 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           privateKey: ${{secrets.SSH_PRIVATE_KEY}}
 
-      - name: ls -a via ssh
-        uses: garygrossgarten/github-action-ssh@release
+      - name: Start Dispatcher Service
+        uses: appleboy/ssh-action@master
         with:
-          command: |
-            fuser -k 8080/tcp
-            java -jar code-0.0.1-SNAPSHOT.jar
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY}}
+          key: ${{ secrets.SSH_PRIVATE_KEY}}
+          port: 22
+          script: |
+            /etc/init/code stop
+            mv code.jar old-code.jar
+            mv code-latest.code code.jar
+            rm -rf code
+            ln -s -f code.jar code
+            code start
+            rm code-old.jar
