@@ -59,7 +59,7 @@ jobs:
 
       - name: Start Dispatcher Service
         uses: garygrossgarten/github-action-ssh@release
-        with:
+        with: 
           command: |
             fuser -k 8080/tcp
             java -jar code-0.0.1-SNAPSHOT.jar
