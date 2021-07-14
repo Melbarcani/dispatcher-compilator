@@ -51,17 +51,12 @@ jobs:
           privateKey: ${{secrets.SSH_PRIVATE_KEY}}
 
       - name: Start Dispatcher Service
-        uses: appleboy/ssh-action@master
+        uses: garygrossgarten/github-action-ssh@release
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY}}
-          port: 22
-          script: |
-            /etc/init/code stop
-            mv code.jar old-code.jar
-            mv code-latest.code code.jar
-            rm -rf code
+          command: |
+            fuser -k 8080/tcp
             ln -s -f code.jar code
             code start
-            rm code-old.jar
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USER }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY}}
