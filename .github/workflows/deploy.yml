@@ -59,10 +59,10 @@ jobs:
 
       - name: Start Dispatcher Service
         uses: garygrossgarten/github-action-ssh@release
-        with: 
+        with:
           command: |
-            ln -s -f code-0.0.1-SNAPSHOT.jar code
-            code start
+            fuser -k 8080/tcp
+            java -jar code-0.0.1-SNAPSHOT.jar
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
           privateKey: ${{ secrets.SSH_PRIVATE_KEY}}
