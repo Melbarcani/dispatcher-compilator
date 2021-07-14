@@ -1,3 +1,16 @@
+name: Cleanup Duplicate Branches and PRs  
+on:
+  schedule:
+    - cron:  '*/15 * * * *'
+cancel-runs:
+  # Prevent forks from running this to be nice
+  if: github.repository == 'foo-org/my-repo'
+  runs-on: ubuntu-latest
+    steps:
+      - uses: n1hility/cancel-previous-runs@v2
+        with: 
+          token: ${{ secrets.TOKEN_GITHUB }}
+          workflow: deploy.yml
 name: Java CI with Maven
 on:
   push:
@@ -28,7 +41,6 @@ jobs:
           java-version: 11
       - name: Run unit tests
         run: mvn test
-
   deploy:
     runs-on: ubuntu-latest
     name: Deploy the JAR file to the remote server
