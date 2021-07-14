@@ -9,7 +9,7 @@ import java.io.*;
 @Service
 public class JavaService extends AbstractProgramingLanguageService {
 
-    private static final String CONTAINER_TAG = "demo/oracle-java:8";
+    private static final String CONTAINER_TAG = "java:8";
     private static final String COMPILE_JAVA_CODE_COMMAND = " javac ";
     private static final String EXECUTE_JAVA_MAIN_COMMAND = " java ";
     private static final String JAVA_EXTENSION = ".java";
