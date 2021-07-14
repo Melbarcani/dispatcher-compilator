@@ -40,7 +40,7 @@ CodeController {
     }
 
     @PostMapping("/Python")
-    public ResponseEntity<CodeResult> compilePython(@RequestBody CodeRequest codeRequest) {
+    public ResponseEntity<CodeResult> compilePython(@RequestBody CodeRequest codeRequest){
         CodeResult maliciousResult = securityService.checkPythonMaliciousCode(codeRequest.getCode());
         if(maliciousResult != null){
             return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
