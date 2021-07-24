@@ -52,7 +52,7 @@ CodeController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/c")
+    @PostMapping("/C")
     public ResponseEntity<CodeResult> compileC(@RequestBody CodeRequest codeRequest){
         String fileName = codeRequest.getExerciseTitle();
         CodeResult maliciousResult = securityService.checkJavaMaliciousCode(codeRequest.getCode());

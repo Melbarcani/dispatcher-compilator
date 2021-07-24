@@ -10,14 +10,12 @@ import java.io.IOException;
 @Service
 public class CService extends AbstractProgramingLanguageService {
 
-    private static final String CONTAINER_TAG = "gcc:4.9";
+    private static final String CONTAINER_TAG = "gcc:49";
     private static final String COMPILE_GCC_CODE_COMMAND = " gcc -o ";
     private static final String EXECUTE_C_PROGRAM_MAIN_COMMAND = " ./";
     private static final String C_EXTENSION = ".c";
 
     public CodeResult compileCode(String fileName, String folderName) {
-        System.out.println(fileName);
-        System.out.println(folderName);
         try {
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + COMPILE_GCC_CODE_COMMAND + fileName + " "+fileName + C_EXTENSION, folderName);
             var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
@@ -55,6 +53,7 @@ public class CService extends AbstractProgramingLanguageService {
     @Override
     protected Process executeDockerCommand(String command, String folderName) throws IOException {
         String currentPath = new File("./" + folderName).getCanonicalPath();
+        System.out.println(DOCKER_RUN_COMMAND + currentPath + command);
         return Runtime.getRuntime().exec(DOCKER_RUN_COMMAND + currentPath + command);
     }
 }
