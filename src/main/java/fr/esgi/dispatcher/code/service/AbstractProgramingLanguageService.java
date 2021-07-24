@@ -9,7 +9,7 @@ public abstract class AbstractProgramingLanguageService {
 
     protected static final String FAILED = "failed";
     protected static final String WORKDIR = ":/app -w /app";
-    protected static final String DOCKER_RUN_COMMAND = "sudo docker run --rm -v "; // sudo is here just to test local code, must be deleted
+    protected static final String DOCKER_RUN_COMMAND = "docker run --rm -v "; // sudo is here just to test local code, must be deleted
 
     public abstract CodeResult executeCode(String fileName, String folderName);
 

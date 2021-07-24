@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Service
 public class CService extends AbstractProgramingLanguageService {
@@ -30,12 +33,14 @@ public class CService extends AbstractProgramingLanguageService {
     }
 
     public long computeByteCodeLines(String folderName, String fileName) {
-        /*try {
-            Process process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + " javap -c " + fileName + "$ChallengeIntern", folderName);
-            return getResult(process.getInputStream()).lines().count();
-        } catch (IOException e) {
+        try{
+            String currentPath = new File(folderName).getCanonicalPath();
+            try(var s = Files.lines(Path.of(currentPath+ fileName.substring(2)+".c"), StandardCharsets.UTF_8);) {
+                return s.count();
+            }
+        } catch (IOException e){
             e.printStackTrace();
-        }*/
+        }
         return -1;
     }
 
@@ -53,7 +58,6 @@ public class CService extends AbstractProgramingLanguageService {
     @Override
     protected Process executeDockerCommand(String command, String folderName) throws IOException {
         String currentPath = new File("./" + folderName).getCanonicalPath();
-        System.out.println(DOCKER_RUN_COMMAND + currentPath + command);
         return Runtime.getRuntime().exec(DOCKER_RUN_COMMAND + currentPath + command);
     }
 }
