@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 
+import static fr.esgi.dispatcher.code.service.AbstractProgramingLanguageService.FAILED;
+
 @Service
 public class PythonService {
     protected static final String WORKDIR = ":/app -w /app";
@@ -21,16 +23,16 @@ public class PythonService {
         var fileName = EXECUTE_PYTHON_MAIN_COMMAND + file + PYTHON_EXTENSION;
         try {
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + fileName, folderName);
+            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
+            if (output.getOutputConsole() != null) return output;
             var consoleOutput = getResult(process.getInputStream());
-            var output = createResult(consoleOutput);
+            output = createResult(consoleOutput);
             if (output.getOutputConsole() != null) return output;
 
-            output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
-            if (output.getOutputConsole() != null) return output;
             return new CodeResult("", STATUS.SUCCESS);
         } catch (
                 IOException e) {
-            return new CodeResult("Exception", STATUS.ERROR);
+            return new CodeResult(FAILED, STATUS.UNCOMPILED);
         }
     }
 

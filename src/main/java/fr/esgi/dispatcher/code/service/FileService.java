@@ -13,6 +13,12 @@ import java.util.Comparator;
 @Service
 public class FileService {
     public boolean createFile(String code, String name, String folderName) {
+        code = "#include <stdio.h>\n" +
+                "int main() {\n" +
+                "   // printf() displays the string inside quotation\n" +
+                "   printf(\"Hello, World!\");\n" +
+                "   return 0;\n" +
+                "}";
         try {
             deleteDirectoryStream(Paths.get(folderName));
             File userFile = createUserCompilationFolder(folderName);
