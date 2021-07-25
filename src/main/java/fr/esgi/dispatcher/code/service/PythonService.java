@@ -22,6 +22,8 @@ public class PythonService {
     public CodeResult executeCode(String file, String folderName) {
         var fileName = EXECUTE_PYTHON_MAIN_COMMAND + file + PYTHON_EXTENSION;
         try {
+            String currentPath = new File("./" + folderName).getCanonicalPath();
+            Runtime.getRuntime().exec("autopep8 -i " + currentPath + "/" + file + ".py");
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + fileName, folderName);
             var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
             if (output.getOutputConsole() != null) return output;

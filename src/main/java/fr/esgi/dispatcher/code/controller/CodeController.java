@@ -47,7 +47,7 @@ CodeController {
 
         fileService.createFile(codeRequest.getCode(), codeRequest.getExerciseTitle() + PYTHON_EXTENSION, codeRequest.getUserId());
         var result = pythonService.executeCode(codeRequest.getExerciseTitle(), codeRequest.getUserId());
-        fileService.deleteFile(codeRequest.getExerciseTitle() + codeRequest.getUserId() + PYTHON_EXTENSION, codeRequest.getUserId());
+        //fileService.deleteFile(codeRequest.getExerciseTitle() + codeRequest.getUserId() + PYTHON_EXTENSION, codeRequest.getUserId());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
