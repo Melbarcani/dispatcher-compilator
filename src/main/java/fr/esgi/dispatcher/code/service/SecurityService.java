@@ -4,6 +4,8 @@ import fr.esgi.dispatcher.code.model.CodeResult;
 import fr.esgi.dispatcher.code.model.STATUS;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service
 public class SecurityService {
     private static final String EXEC = "exec";
@@ -13,14 +15,14 @@ public class SecurityService {
 
     public CodeResult checkJavaMaliciousCode(String code){
         if(code.contains(EXEC)){
-            return new CodeResult("It's impossible to execute this malicious code. It smells so BAAAAD!!!", STATUS.UNCOMPILED,0);
+            return new CodeResult("It's impossible to execute this malicious code. It smells so BAAAAD!!!", STATUS.UNCOMPILED,0, Collections.emptyList());
         }
         return null;
     }
 
     public CodeResult checkPythonMaliciousCode(String code){
         if(code.contains(OS_SYSTEM) || code.contains(SUB_PROCESS)){
-            return new CodeResult("It's impossible to execute this malicious code. It smells so BAAAAD!!!", STATUS.UNCOMPILED,0);
+            return new CodeResult("It's impossible to execute this malicious code. It smells so BAAAAD!!!", STATUS.UNCOMPILED,0,Collections.emptyList());
         }
         return null;
     }

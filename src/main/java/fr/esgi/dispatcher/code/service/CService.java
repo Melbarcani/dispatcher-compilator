@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 
 @Service
 public class CService extends AbstractProgramingLanguageService {
@@ -21,14 +22,14 @@ public class CService extends AbstractProgramingLanguageService {
     public CodeResult compileCode(String fileName, String folderName) {
         try {
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + COMPILE_GCC_CODE_COMMAND + fileName + " "+fileName + C_EXTENSION, folderName);
-            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
+            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR,Collections.emptyList());
 
             if (output.getOutputConsole() != null) return output;
             return executeCode(process, fileName, folderName);
 
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            return new CodeResult(FAILED + " " + e.getMessage(), STATUS.UNCOMPILED);
+            return new CodeResult(FAILED + " " + e.getMessage(), STATUS.UNCOMPILED,Collections.emptyList());
         }
     }
 
@@ -48,7 +49,7 @@ public class CService extends AbstractProgramingLanguageService {
         if (process.waitFor() == 0) {
             return executeCode(fileName, folderName);
         }
-        return new CodeResult("", STATUS.ERROR);
+        return new CodeResult("", STATUS.ERROR, Collections.emptyList());
     }
 
     public CodeResult executeCode(String fileName, String folderName) {

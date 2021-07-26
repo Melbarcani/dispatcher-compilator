@@ -5,6 +5,7 @@ import fr.esgi.dispatcher.code.model.STATUS;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.Collections;
 
 import static fr.esgi.dispatcher.code.service.AbstractProgramingLanguageService.FAILED;
 
@@ -25,16 +26,16 @@ public class PythonService {
             String currentPath = new File("./" + folderName).getCanonicalPath();
             Runtime.getRuntime().exec("autopep8 -i " + currentPath + "/" + file + ".py");
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + fileName, folderName);
-            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
+            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR, Collections.emptyList());
             if (output.getOutputConsole() != null) return output;
             var consoleOutput = getResult(process.getInputStream());
             output = createResult(consoleOutput);
             if (output.getOutputConsole() != null) return output;
 
-            return new CodeResult("", STATUS.SUCCESS);
+            return new CodeResult("", STATUS.SUCCESS,Collections.emptyList());
         } catch (
                 IOException e) {
-            return new CodeResult(FAILED, STATUS.UNCOMPILED);
+            return new CodeResult(FAILED, STATUS.UNCOMPILED,Collections.emptyList());
         }
     }
 
@@ -50,9 +51,9 @@ public class PythonService {
         }
         if (consoleOutput.contains(REGEX_COUNT)) {
             String[] parts = consoleOutput.split(REGEX_COUNT);
-            return new CodeResult(parts[1], STATUS.SUCCESS, instructionsCount);
+            return new CodeResult(parts[1], STATUS.SUCCESS, instructionsCount, Collections.emptyList());
         }
-        return new CodeResult(consoleOutput, STATUS.SUCCESS, instructionsCount);
+        return new CodeResult(consoleOutput, STATUS.SUCCESS, instructionsCount, Collections.emptyList());
     }
 
     protected Process executeDockerCommand(String command, String folderName) throws IOException {

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/compiler")
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ CodeController {
     private final PythonService pythonService;
     private final SecurityService securityService;
     private final CService cService;
+    private final CodeAnalyserService codeAnalyserService;
 
     @PostMapping("/Java")
     public ResponseEntity<CodeResult> compileJava(@RequestBody CodeRequest codeRequest) {
@@ -32,9 +35,15 @@ CodeController {
             return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
         }
         fileService.createFile(codeRequest.getCode(), fileName + JAVA_EXTENSION, codeRequest.getUserId());
-        var result = javaService.compileCode(fileName, codeRequest.getUserId());
+        System.out.println("LAAA");
+        List<String> rulesViolation = codeAnalyserService.checkBadCode(codeRequest.getUserId());
+        System.out.println("ET ICIII");
+        System.out.println(rulesViolation);
+        var result = javaService.compileCode(fileName, codeRequest.getUserId(), rulesViolation);
+        //result.setCodeAnalysisResult(rulesViolation);
         fileService.deleteFile(fileName + JAVA_EXTENSION, codeRequest.getUserId());
 
+        System.out.println("PUIS ICIII");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -47,7 +56,7 @@ CodeController {
 
         fileService.createFile(codeRequest.getCode(), codeRequest.getExerciseTitle() + PYTHON_EXTENSION, codeRequest.getUserId());
         var result = pythonService.executeCode(codeRequest.getExerciseTitle(), codeRequest.getUserId());
-        //fileService.deleteFile(codeRequest.getExerciseTitle() + codeRequest.getUserId() + PYTHON_EXTENSION, codeRequest.getUserId());
+        fileService.deleteFile(codeRequest.getExerciseTitle() + codeRequest.getUserId() + PYTHON_EXTENSION, codeRequest.getUserId());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

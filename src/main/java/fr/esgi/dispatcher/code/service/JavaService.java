@@ -5,6 +5,7 @@ import fr.esgi.dispatcher.code.model.STATUS;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.List;
 
 @Service
 public class JavaService extends AbstractProgramingLanguageService {
@@ -14,17 +15,17 @@ public class JavaService extends AbstractProgramingLanguageService {
     private static final String EXECUTE_JAVA_MAIN_COMMAND = " java ";
     private static final String JAVA_EXTENSION = ".java";
 
-    public CodeResult compileCode(String fileName, String folderName) {
+    public CodeResult compileCode(String fileName, String folderName, List<String> rulesViolationList) {
         try {
             var process = executeDockerCommand(WORKDIR + " " + CONTAINER_TAG + COMPILE_JAVA_CODE_COMMAND + fileName + JAVA_EXTENSION, folderName);
-            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR);
+            var output = new CodeResult(getResult(process.getErrorStream()), STATUS.ERROR, rulesViolationList);
 
             if (output.getOutputConsole() != null) return output;
-            return executeCode(process, fileName, folderName);
+            return executeCode(process, fileName, folderName, rulesViolationList);
 
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            return new CodeResult(FAILED + " " + e.getMessage(), STATUS.UNCOMPILED);
+            return new CodeResult(FAILED + " " + e.getMessage(), STATUS.UNCOMPILED, rulesViolationList);
         }
     }
 
@@ -38,15 +39,20 @@ public class JavaService extends AbstractProgramingLanguageService {
         return -1;
     }
 
-    private CodeResult executeCode(Process process, String fileName, String folderName) throws InterruptedException {
+    private CodeResult executeCode(Process process, String fileName, String folderName, List<String> rulesViolationList) throws InterruptedException {
         if (process.waitFor() == 0) {
-            return executeCode(fileName, folderName);
+            return executeCode(fileName, folderName,rulesViolationList);
         }
-        return new CodeResult("", STATUS.ERROR);
+        return new CodeResult("", STATUS.ERROR, rulesViolationList);
     }
 
+    public CodeResult executeCode(String fileName, String folderName, List<String> rulesViolationList) {
+        return executeCode(CONTAINER_TAG, EXECUTE_JAVA_MAIN_COMMAND + fileName, folderName, rulesViolationList);
+    }
+
+    @Override
     public CodeResult executeCode(String fileName, String folderName) {
-        return executeCode(CONTAINER_TAG, EXECUTE_JAVA_MAIN_COMMAND + fileName, folderName);
+        return null;
     }
 
     @Override
