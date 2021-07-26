@@ -35,15 +35,10 @@ CodeController {
             return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
         }
         fileService.createFile(codeRequest.getCode(), fileName + JAVA_EXTENSION, codeRequest.getUserId());
-        System.out.println("LAAA");
         List<String> rulesViolation = codeAnalyserService.checkBadCode(codeRequest.getUserId());
-        System.out.println("ET ICIII");
-        System.out.println(rulesViolation);
         var result = javaService.compileCode(fileName, codeRequest.getUserId(), rulesViolation);
-        //result.setCodeAnalysisResult(rulesViolation);
         fileService.deleteFile(fileName + JAVA_EXTENSION, codeRequest.getUserId());
 
-        System.out.println("PUIS ICIII");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -64,7 +59,7 @@ CodeController {
     @PostMapping("/C")
     public ResponseEntity<CodeResult> compileC(@RequestBody CodeRequest codeRequest){
         String fileName = codeRequest.getExerciseTitle();
-        CodeResult maliciousResult = securityService.checkJavaMaliciousCode(codeRequest.getCode());
+        CodeResult maliciousResult = securityService.checkCMaliciousCode(codeRequest.getCode());
         if(maliciousResult != null){
             return new ResponseEntity<>(maliciousResult, HttpStatus.OK);
         }

@@ -11,6 +11,10 @@ public class SecurityService {
     private static final String EXEC = "exec";
     private static final String OS_SYSTEM = "os.system";
     private static final String SUB_PROCESS = "subprocess";
+    private static final String FORK = "fork()";
+    private static final String MALLOC = "malloc";
+    private static final String F_OPEN = "fopen";
+    private static final String SLEEP = "sleep";
 
 
     public CodeResult checkJavaMaliciousCode(String code){
@@ -26,4 +30,13 @@ public class SecurityService {
         }
         return null;
     }
+
+    public CodeResult checkCMaliciousCode(String code){
+        if(code.contains(FORK) || code.contains(MALLOC) || code.contains(F_OPEN)|| code.contains(SLEEP)){
+            return new CodeResult("It's impossible to execute this malicious code. It smells so BAAAAD!!!", STATUS.UNCOMPILED,0,Collections.emptyList());
+        }
+        return null;
+    }
+
+
 }
