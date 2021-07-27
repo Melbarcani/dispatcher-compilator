@@ -58,7 +58,6 @@ public class CodeAnalyserService {
             renderer.end();
             renderer.flush();
             Document doc = Jsoup.parse(rendererOutput.toString(), "", Parser.xmlParser());
-            System.out.println("Avant la fin codeAnalyserClass");
             return new ArrayList<>(doc.select("violation").eachText());
         } catch (IOException e) {
             e.printStackTrace();
