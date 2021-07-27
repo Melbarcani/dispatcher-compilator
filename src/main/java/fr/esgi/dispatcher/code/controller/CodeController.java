@@ -29,6 +29,7 @@ CodeController {
 
     @PostMapping("/Java")
     public ResponseEntity<CodeResult> compileJava(@RequestBody CodeRequest codeRequest) {
+        System.out.println("JAVA");
         String fileName = codeRequest.getExerciseTitle();
         CodeResult maliciousResult = securityService.checkJavaMaliciousCode(codeRequest.getCode());
         if(maliciousResult != null){
