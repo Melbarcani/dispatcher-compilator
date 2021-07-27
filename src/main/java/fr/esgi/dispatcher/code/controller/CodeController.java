@@ -10,15 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static fr.esgi.dispatcher.code.model.Extension.*;
+
 @RestController
 @RequestMapping("/api/compiler")
 @RequiredArgsConstructor
 public class
 CodeController {
-
-    private static final String JAVA_EXTENSION = ".java";
-    private static final String PYTHON_EXTENSION = ".py";
-    private static final String C_EXTENSION = ".c";
 
     private final JavaService javaService;
     private final FileService fileService;
@@ -29,7 +27,6 @@ CodeController {
 
     @PostMapping("/Java")
     public ResponseEntity<CodeResult> compileJava(@RequestBody CodeRequest codeRequest) {
-        System.out.println("JAVA ");
         String fileName = codeRequest.getExerciseTitle();
         CodeResult maliciousResult = securityService.checkJavaMaliciousCode(codeRequest.getCode());
         if(maliciousResult != null){
